@@ -2,25 +2,55 @@ const inputText = document.querySelector("#cpf");
 const lbl = document.querySelector('#lbl-cpf');
 const btn = document.querySelector("#btn");
 const sts = document.querySelector("#status");
+let vlr;
 
 inputText.onblur = () => {
-    let vlr = inputText.value
-    if (vlr.length === 11 ) {
-        lbl.innerHTML = "CPF"
-    } else {
-        lbl.innerHTML = "CNPJ"
-    }
+    changeLabel();
 };
 
 inputText.onfocus = () => {
-    console.log('foco');
     sts.innerHTML = '';
     inputText.value = '';
 };
 
+document.addEventListener('keypress', e => {
+
+    if (e.key === 'Enter') {
+        changeLabel();
+        const el = e.target;
+        e.preventDefault();
+        
+        vlr = inputText.value;
+        if (vlr.length === 11){
+            if (validaCPF(inputText.value)) {
+                sts.classList.remove('invalido');
+                sts.innerHTML = 'Válido!';
+            } else {
+                sts.classList.add('invalido');
+                sts.innerHTML = 'Inválido!';
+            };
+            return;
+        }else if (vlr.length === 14) {
+            if (validaCNPJ(inputText.value)) {
+                sts.classList.remove('invalido');
+                sts.innerHTML = 'Válido!';
+            } else {
+                sts.classList.add('invalido');
+                sts.innerHTML = 'Inválido!';
+            };
+            return;
+        }else{
+            alert("Número insuficiente de caracteres!")
+        };
+
+    }
+
+});
+
 btn.addEventListener('click', e => {
     const el = e.target;
     e.preventDefault();
+    changeLabel();
     if (lbl.innerHTML === 'CPF'){
         if (validaCPF(inputText.value)) {
             sts.classList.remove('invalido');
@@ -40,6 +70,24 @@ btn.addEventListener('click', e => {
     }
 });
 
+function changeLabel() {
+    vlr = inputText.value;
+
+    if (isNaN(vlr)) {
+        alert("Este campo só aceita valores númericos!");
+        return;
+    }
+
+    if (vlr.length === 11 ) {
+        lbl.innerHTML = "CPF"
+        return;
+    }
+
+    if(vlr.length === 14 ){
+        lbl.innerHTML = "CNPJ"
+        return;
+    }
+}
 
 function validaCPF(valor) {
     const v = [...valor.slice(0, 9)].map(v => Number(v));
